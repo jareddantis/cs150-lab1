@@ -16,8 +16,8 @@ class WordManager():
         self.words = self.__load_from_file__(words_path)
         guesses = self.__load_from_file__(guess_path)
 
-        # Create intersection of words and allowed guesses for checking later
-        self.allowed = list(set(self.words).intersection(set(guesses)))
+        # Create union of words and allowed guesses for checking later
+        self.allowed = list(set(self.words).union(set(guesses)))
     
     def __load_from_file__(self, path: str) -> List[str]:
         """

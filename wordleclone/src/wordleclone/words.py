@@ -24,7 +24,7 @@ class WordManager():
         Loads a file into memory and returns a list of lines.
         """
         with open(path, 'r') as file:
-            return [line.rstrip() for line in file]
+            return [line.rstrip().lower() for line in file]
     
     def get_word(self) -> str:
         """

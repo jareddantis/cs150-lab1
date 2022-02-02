@@ -7,6 +7,19 @@ from toga.style.pack import COLUMN, ROW
 
 
 class WordleClone(toga.App):
+    def __init__(self):
+        # Initialize app
+        super().__init__(
+            'Wordle Clone',
+            'cs150.dantis.aureljared',
+            author='Aurel Jared C. Dantis',
+            description="A wordle clone made with BeeWare and Toga",
+            version='0.1.0',
+            home_page="https://github.com/jareddantis/wordle-app"
+        )
+
+        # Initialize app state
+        self.word = ''
 
     def startup(self):
         """

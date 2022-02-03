@@ -1,13 +1,13 @@
 """
 My first application
 """
-from ctypes import alignment
 import toga
 from toga.style import Pack
-from toga.style.pack import LEFT, COLUMN
+from toga.style.pack import LEFT, COLUMN, ROW
 from typing import List
 from .guess_row import GuessRow
-from .words import WordManager, STATE_CORRECT, STATE_MISPLACED, STATE_INCORRECT
+from .words import WordManager
+from .constants import *
 
 
 class WordleClone(toga.App):
@@ -26,6 +26,9 @@ class WordleClone(toga.App):
         self.guess = 0
         self.guess_rows: List[GuessRow] = []
         self.guess_input = None
+
+        # Initialize list of labels for possible letters
+        self.letter_list = []
 
         # Initialize word manager and get the word for this session
         self.word_manager = WordManager(self.paths.app)
@@ -63,6 +66,13 @@ class WordleClone(toga.App):
         
         # Input is valid
         return True
+    
+    def disable_letter(self, letter: str):
+        """
+        Removes a letter from the list of remaining possible letters.
+        """
+        label_index = 'abcdefghijklmnopqrstuvwxyz'.index(letter)
+        self.letter_list[label_index].enabled = False
     
     def reset_input(self, error_msg: str):
         """
@@ -114,12 +124,14 @@ class WordleClone(toga.App):
                         # This letter has already occurred enough times,
                         # so it is incorrect.
                         states[index] = STATE_INCORRECT
+                        self.disable_letter(letter)
                     else:
                         # This letter has not exceeded the number of times
                         # it appears in the original word, so it is only misplaced.
                         states[index] = STATE_MISPLACED
                 else:
                     # Letter is nowhere in the word.
+                    self.disable_letter(letter)
                     states[index] = STATE_INCORRECT
         
         # Update appropriate guess row
@@ -128,20 +140,31 @@ class WordleClone(toga.App):
 
     def startup(self):
         # Create main content box
-        main_box = toga.Box(style=Pack(direction=COLUMN, padding=10))
+        main_box = toga.Box(style=Pack(alignment='center', direction=COLUMN, padding=10))
 
         # Build guess input form
-        guess_label = toga.Label('Guess:', style=Pack(text_align=LEFT, padding=5))
-        guess_input = toga.TextInput(style=Pack(flex=1))
-        guess_button = toga.Button('Guess', on_press=self.on_guess, style=Pack(padding=5))
+        guess_label = toga.Label('Guess:', style=Pack(text_align=LEFT, padding=5, flex=1))
+        guess_input = toga.TextInput(style=Pack(flex=2))
+        guess_button = toga.Button('Guess', on_press=self.on_guess, style=Pack(padding=(5, 0)))
         guess_box = toga.Box()
         guess_box.add(guess_label)
         guess_box.add(guess_input)
         main_box.add(guess_box)
         main_box.add(guess_button)
 
+        # Build letter cheatsheet
+        letter_box = toga.Box(style=Pack(flex=1, direction=ROW, padding=(10, 0)))
+        for letter in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
+            letter_label = toga.Label(letter, style=Pack(
+                flex=1,
+                text_align='center'
+            ))
+            self.letter_list.append(letter_label)
+            letter_box.add(letter_label)
+        main_box.add(letter_box)
+
         # Build word display, which is a 6x5 grid of boxes
-        word_box = toga.Box(style=Pack(direction=COLUMN, alignment='center', padding=5))
+        word_box = toga.Box(style=Pack(flex=1, direction=COLUMN, padding_top=10))
         for _ in range(6):
             row = GuessRow()
             self.guess_rows.append(row)

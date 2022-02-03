@@ -3,12 +3,6 @@ from random import choice
 from typing import List
 
 
-# Guessed letters states
-STATE_CORRECT = 0
-STATE_MISPLACED = 1
-STATE_INCORRECT = 2
-
-
 class WordManager():
     def __init__(self, base_path: str):
         """

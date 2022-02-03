@@ -4,7 +4,7 @@ My first application
 import toga
 from toga.style import Pack
 from toga.style.pack import LEFT, COLUMN, ROW
-from typing import List
+from typing import List, Optional
 from .guess_row import GuessRow
 from .words import WordManager
 from .constants import *
@@ -74,12 +74,13 @@ class WordleClone(toga.App):
         label_index = 'abcdefghijklmnopqrstuvwxyz'.index(letter)
         self.letter_list[label_index].enabled = False
     
-    def reset_input(self, error_msg: str):
+    def reset_input(self, error_msg: Optional[str] = None):
         """
         Resets the guess input box and shows an error dialog.
         """
         self.guess_input.value = ''
-        self.main_window.error_dialog('Error', error_msg)
+        if isinstance(error_msg, str):
+            self.main_window.error_dialog('Error', error_msg)
 
     def on_guess(self, _):
         """
@@ -137,6 +138,9 @@ class WordleClone(toga.App):
         # Update appropriate guess row
         self.guess_rows[self.guess].update(list(value), states)
         self.guess += 1
+
+        # Reset guess input box
+        self.reset_input()
 
     def startup(self):
         # Create main content box

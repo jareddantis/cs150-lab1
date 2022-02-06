@@ -139,6 +139,11 @@ class WordleClone(toga.App):
         self.guess_rows[self.guess].update(list(value), states)
         self.guess += 1
 
+        # Check if all letters have been guessed
+        if len(remaining_letters) == 0:
+            self.guessed = True
+            self.main_window.info_dialog('Congratulations!', 'You guessed the word!')
+
         # Reset guess input box
         self.reset_input()
 

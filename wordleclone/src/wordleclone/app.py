@@ -5,6 +5,7 @@ import toga
 from toga.style import Pack
 from toga.style.pack import LEFT, COLUMN, ROW
 from typing import List, Optional
+from .letter import WordleLetter
 from .guess_row import GuessRow
 from .words import WordManager
 from .constants import *
@@ -26,6 +27,7 @@ class WordleClone(toga.App):
         self.guess = 0
         self.guess_rows: List[GuessRow] = []
         self.guess_input = None
+        self.guessed = False
 
         # Initialize list of labels for possible letters
         self.letter_list = []
@@ -67,12 +69,20 @@ class WordleClone(toga.App):
         # Input is valid
         return True
     
+    def enable_letter(self, letter: str):
+        """
+        Turns a letter green in the list of remaining possible letters.
+        """
+        label_index = 'abcdefghijklmnopqrstuvwxyz'.index(letter)
+        self.letter_list[label_index].green = True
+    
     def disable_letter(self, letter: str):
         """
         Removes a letter from the list of remaining possible letters.
         """
         label_index = 'abcdefghijklmnopqrstuvwxyz'.index(letter)
-        self.letter_list[label_index].enabled = False
+        if not self.letter_list[label_index].green:
+            self.letter_list[label_index].enabled = False
     
     def reset_input(self, error_msg: Optional[str] = None):
         """
@@ -91,6 +101,10 @@ class WordleClone(toga.App):
             STATE_MISPLACED: the letter is in the word but not in the correct position.
             STATE_INCORRECT: the letter is not in the word or has already been guessed.
         """
+        # Do nothing if already guessed
+        if self.guessed:
+            return
+
         # Do nothing if maximum guesses reached
         if self.guess == 6:
             self.main_window.error_dialog('Error', 'Maximum number of guesses reached.')
@@ -109,6 +123,9 @@ class WordleClone(toga.App):
             if letter == self.word[index]:
                 # Letter is in the word and in the correct position
                 states[index] = STATE_CORRECT
+
+                # Turn the letter green
+                self.enable_letter(letter)
 
                 # Remove first occurrence of letter from remaining letters
                 remaining_letters.remove(letter)
@@ -162,12 +179,9 @@ class WordleClone(toga.App):
         main_box.add(guess_button)
 
         # Build letter cheatsheet
-        letter_box = toga.Box(style=Pack(flex=1, direction=ROW, padding=(10, 0)))
+        letter_box = toga.Box(style=Pack(flex=1, direction=ROW, padding=(20, 0)))
         for letter in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
-            letter_label = toga.Label(letter, style=Pack(
-                flex=1,
-                text_align='center'
-            ))
+            letter_label = WordleLetter(letter)
             self.letter_list.append(letter_label)
             letter_box.add(letter_label)
         main_box.add(letter_box)

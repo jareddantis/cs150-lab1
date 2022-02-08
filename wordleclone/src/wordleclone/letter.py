@@ -1,6 +1,6 @@
 from toga import Label
 from toga.style import Pack
-from .constants import COLOR_GREEN
+from .constants import COLOR_GREEN, COLOR_GREY
 
 class WordleLetter(Label):
     def __init__(self, letter: str):
@@ -21,4 +21,4 @@ class WordleLetter(Label):
         if value:
             self.style.update(font_weight='bold', color=COLOR_GREEN)
         else:
-            self.style.update(font_weight='normal', color='black')
+            self.style.update(font_weight='normal', color=COLOR_GREY)

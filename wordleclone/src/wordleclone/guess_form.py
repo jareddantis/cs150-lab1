@@ -55,7 +55,7 @@ class GuessForm(Box):
             return 'Guess must only contain letters.'
         
         # Show error if guess is not in the list of allowed guesses
-        if self.word_manager is not None and self.word_manager.is_allowed(value):
+        if self.word_manager is not None and not self.word_manager.is_allowed(value):
             return 'Guess must be in the list of allowed guesses.'
         
         # Input is valid

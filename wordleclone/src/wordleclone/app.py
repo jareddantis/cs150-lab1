@@ -193,7 +193,7 @@ class WordleClone(toga.App):
         main_box.add(word_box)
 
         # Build restart button
-        restart_button = toga.Button('Restart', on_press=self.restart_game, style=Pack(padding=(30, 0, 0, 0)))
+        restart_button = toga.Button('Restart', on_press=self.restart_game, style=Pack(padding=(30, 0, 10, 0)))
         main_box.add(restart_button)
 
         # Instantiate main window and show app content

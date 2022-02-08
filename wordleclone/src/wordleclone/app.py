@@ -30,7 +30,7 @@ class WordleClone(toga.App):
         self.guessed = False
 
         # Initialize list of labels for possible letters
-        self.letter_list = []
+        self.letter_list: List[WordleLetter] = []
 
         # Initialize word manager and get the word for this session
         self.word_manager = WordManager(self.paths.app)
@@ -82,7 +82,7 @@ class WordleClone(toga.App):
         """
         label_index = 'abcdefghijklmnopqrstuvwxyz'.index(letter)
         if not self.letter_list[label_index].green:
-            self.letter_list[label_index].enabled = False
+            self.letter_list[label_index].visible = False
     
     def reset_input(self, error_msg: Optional[str] = None):
         """
@@ -163,6 +163,28 @@ class WordleClone(toga.App):
 
         # Reset guess input box
         self.reset_input()
+    
+    def restart_game(self, _):
+        """
+        Restarts the game.
+        """
+        # Reset number of guesses
+        self.guess = 0
+        self.guessed = False
+
+        # Reset input box
+        self.reset_input()
+
+        # Reset guess rows
+        for row in self.guess_rows:
+            row.reset()
+        
+        # Reset list of remaining letters
+        for letter in self.letter_list:
+            letter.reset()
+
+        # Get a new word
+        self.word = self.word_manager.get_word()
 
     def startup(self):
         # Create main content box
@@ -193,6 +215,10 @@ class WordleClone(toga.App):
             self.guess_rows.append(row)
             word_box.add(row)
         main_box.add(word_box)
+
+        # Build restart button
+        restart_button = toga.Button('Restart', on_press=self.restart_game, style=Pack(padding=(30, 0, 0, 0)))
+        main_box.add(restart_button)
 
         # Save guess input box for later
         self.guess_input = guess_input

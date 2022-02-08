@@ -138,6 +138,9 @@ class WordleClone(toga.App):
         if len(remaining_letters) == 0:
             self.guessed = True
             self.main_window.info_dialog('Congratulations!', 'You guessed the word!')
+        else:
+            if self.guess == 6:
+                self.main_window.error_dialog('Error', f'Maximum number of guesses reached. The answer was: {self.word}')
 
         # Reset guess input box
         self.reset_input()

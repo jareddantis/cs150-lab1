@@ -3,9 +3,10 @@ My first application
 """
 import toga
 from toga.style import Pack
-from toga.style.pack import LEFT, COLUMN, ROW
+from toga.style.pack import COLUMN, ROW
 from typing import List, Optional
 from .letter import WordleLetter
+from .guess_form import GuessForm
 from .guess_row import GuessRow
 from .words import WordManager
 from .constants import *
@@ -26,7 +27,7 @@ class WordleClone(toga.App):
         # Initialize number of guesses, guess rows, and guess input box
         self.guess = 0
         self.guess_rows: List[GuessRow] = []
-        self.guess_input = None
+        self.guess_form = None
         self.guessed = False
 
         # Initialize list of labels for possible letters
@@ -45,29 +46,6 @@ class WordleClone(toga.App):
             if letter == search:
                 indices.append(index)
         return indices
-    
-    def validate_input(self) -> bool:
-        """
-        Checks whether the current guess is 5 characters long,
-        contains only letters, and is in the list of allowed guesses.
-        """
-        # Show error dialog if guess is not exactly 5 characters long
-        if len(self.guess_input.value) != 5:
-            self.reset_input('Guess must be exactly 5 characters long.')
-            return False
-        
-        # Show error dialog if guess contains non-alphabet characters
-        if not self.guess_input.value.isalpha():
-            self.reset_input('Guess must only contain letters.')
-            return False
-        
-        # Show error dialog if guess is not in the list of allowed guesses
-        if not self.word_manager.is_allowed(self.guess_input.value):
-            self.reset_input('Guess must be in the list of allowed guesses.')
-            return False
-        
-        # Input is valid
-        return True
     
     def enable_letter(self, letter: str):
         """
@@ -88,7 +66,7 @@ class WordleClone(toga.App):
         """
         Resets the guess input box and shows an error dialog.
         """
-        self.guess_input.value = ''
+        self.guess_form.value = ''
         if isinstance(error_msg, str):
             self.main_window.error_dialog('Error', error_msg)
 
@@ -110,7 +88,7 @@ class WordleClone(toga.App):
             self.main_window.error_dialog('Error', 'Maximum number of guesses reached.')
 
         # Do nothing if not ready yet or input is invalid
-        if self.guess_input is None or not self.validate_input():
+        if self.guess_form is None or not self.guess_form.validate():
             return
 
         # Initialize states
@@ -118,7 +96,7 @@ class WordleClone(toga.App):
         remaining_letters = list(self.word)
 
         # Check each letter in the guess against the word
-        value = self.guess_input.value.lower()
+        value = self.guess_form.value
         for index, letter in enumerate(list(value)):
             if letter == self.word[index]:
                 # Letter is in the word and in the correct position
@@ -191,14 +169,9 @@ class WordleClone(toga.App):
         main_box = toga.Box(style=Pack(alignment='center', direction=COLUMN, padding=10))
 
         # Build guess input form
-        guess_label = toga.Label('Guess:', style=Pack(text_align=LEFT, padding=5, flex=1))
-        guess_input = toga.TextInput(style=Pack(flex=2))
-        guess_button = toga.Button('Guess', on_press=self.on_guess, style=Pack(padding=(5, 0)))
-        guess_box = toga.Box()
-        guess_box.add(guess_label)
-        guess_box.add(guess_input)
-        main_box.add(guess_box)
-        main_box.add(guess_button)
+        guess_form = GuessForm(self.on_guess, self.word_manager)
+        main_box.add(guess_form)
+        self.guess_form = guess_form
 
         # Build letter cheatsheet
         letter_box = toga.Box(style=Pack(flex=1, direction=ROW, padding=(20, 0)))
@@ -219,9 +192,6 @@ class WordleClone(toga.App):
         # Build restart button
         restart_button = toga.Button('Restart', on_press=self.restart_game, style=Pack(padding=(30, 0, 0, 0)))
         main_box.add(restart_button)
-
-        # Save guess input box for later
-        self.guess_input = guess_input
 
         # Instantiate main window and show app content
         self.main_window = toga.MainWindow(title=self.formal_name)

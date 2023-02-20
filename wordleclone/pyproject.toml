@@ -2,10 +2,10 @@
 project_name = "Wordle Clone"
 bundle = "cs150.dantis.aureljared"
 version = "0.0.1"
-url = "https://github.com/jareddantis/wordle-app"
+url = "https://github.com/jareddantis/cs150-lab1"
 license = "GNU General Public License v3 (GPLv3)"
 author = 'Aurel Jared C. Dantis'
-author_email = "***REMOVED***"
+author_email = "[REDACTED]"
 
 [tool.briefcase.app.wordleclone]
 formal_name = "Wordle Clone"
